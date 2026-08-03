@@ -1,0 +1,9 @@
+from collections.abc import Sequence
+from typing import Any, Protocol, runtime_checkable
+
+
+@runtime_checkable
+class VectorStore(Protocol):
+    async def add(self, chunk_id: str, vector: Sequence[float], metadata: dict[str, Any]) -> None: ...
+    async def search(self, vector: Sequence[float], top_k: int = 10, filters: dict[str, Any] | None = None) -> list[dict[str, Any]]: ...
+    async def delete(self, chunk_id: str) -> None: ...

@@ -1,0 +1,82 @@
+[project]
+name = "rag-platform"
+version = "0.1.0"
+description = "Production-ready modular RAG Platform"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "RAG Platform Team"}]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "pre-commit>=3.6",
+]
+
+[dependencies]
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.0"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.35"}
+alembic = "^1.13.1"
+asyncpg = "^0.30.0"
+psycopg2-binary = "^2.9.9"
+pgvector = "^0.3.5"
+pydantic = {extras = ["email"], version = "^2.9.0"}
+pydantic-settings = "^2.5.0"
+python-dotenv = "^1.0.1"
+pyyaml = "^6.0.2"
+redis = "^5.0.4"
+celery = {extras = ["redis"], version = "^5.4.0"}
+httpx = "^0.27.0"
+sentence-transformers = "^3.0.1"
+rank-bm25 = "^0.2.2"
+aiofiles = "^24.1.0"
+python-multipart = "^0.0.9"
+pypdf = "^4.3.1"
+beautifulsoup4 = "^4.12.3"
+lxml = "^5.3.0"
+markdownify = "^0.14.1"
+numpy = "^2.1.0"
+tenacity = "^9.0.0"
+
+[project.optional-dependencies]
+embeddings = [
+    "sentence-transformers>=3.0.1",
+    "ollama>=0.4.0",
+]
+reranker = [
+    "cross-encoder>=2.3.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.hatch.build.targets.sdist]
+include = ["app", "tests", "config", "migrations", "docs", "pyproject.toml", "README.md", ".env.example"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+
+[tool.alembic]
+script_location = "migrations"

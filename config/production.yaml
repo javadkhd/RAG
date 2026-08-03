@@ -1,0 +1,54 @@
+app:
+  name: "RAG Platform"
+  version: "0.1.0"
+  debug: false
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+
+database:
+  url: "${DATABASE_URL}"
+  echo: false
+  pool_size: 10
+  max_overflow: 20
+
+redis:
+  url: "${REDIS_URL}"
+
+celery:
+  broker_url: "${CELERY_BROKER_URL}"
+  result_backend: "${CELERY_RESULT_BACKEND}"
+
+llm:
+  provider: "${LLM_PROVIDER:ollama}"
+  model: "${LLM_MODEL:llama3}"
+  base_url: "${LLM_BASE_URL:http://localhost:11434}"
+  temperature: 0.1
+  max_tokens: 4096
+
+embedding:
+  provider: "${EMBEDDING_PROVIDER:bge_m3}"
+  model_name: "${EMBEDDING_MODEL_NAME:BAAI/bge-m3}"
+  device: "${EMBEDDING_DEVICE:cpu}"
+  normalize: true
+
+retrieval:
+  dense_weight: 0.6
+  bm25_weight: 0.4
+  top_k: 10
+  rerank_top_k: 5
+  similarity_threshold: 0.7
+
+ingestion:
+  chunk_size: 512
+  chunk_overlap: 50
+  max_workers: 4
+
+storage:
+  upload_dir: "/app/storage/uploads"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

@@ -1,0 +1,54 @@
+app:
+  name: "RAG Platform"
+  version: "0.1.0"
+  debug: true
+
+server:
+  host: "127.0.0.1"
+  port: 8001
+  reload: true
+
+database:
+  url: "postgresql+asyncpg://rag:ragpass@localhost:5432/ragtestdb"
+  echo: false
+  pool_size: 2
+  max_overflow: 5
+
+redis:
+  url: "redis://localhost:6379/1"
+
+celery:
+  broker_url: "redis://localhost:6379/2"
+  result_backend: "redis://localhost:6379/3"
+
+llm:
+  provider: "mock"
+  model: "mock-model"
+  base_url: "http://localhost:11434"
+  temperature: 0.0
+  max_tokens: 512
+
+embedding:
+  provider: "mock"
+  model_name: "mock-model"
+  device: "cpu"
+  normalize: true
+
+retrieval:
+  dense_weight: 0.6
+  bm25_weight: 0.4
+  top_k: 5
+  rerank_top_k: 3
+  similarity_threshold: 0.5
+
+ingestion:
+  chunk_size: 256
+  chunk_overlap: 25
+  max_workers: 1
+
+storage:
+  upload_dir: "./storage/test_uploads"
+
+logging:
+  level: "WARNING"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
