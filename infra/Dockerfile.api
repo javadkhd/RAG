@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml ./
+# COPY pyproject.toml ./
+COPY . .
 RUN pip install --no-cache-dir --prefix=/install -e ".[embeddings,reranker]"
 
 FROM python:3.11-slim

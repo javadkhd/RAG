@@ -19,11 +19,15 @@ help:
 	@echo "  make docker-down  Stop Docker services"
 	@echo "  make docker-logs  Show Docker logs"
 
+
+PYTHON := python3
+
+
 install:
-	pip install -e .
+	$(PYTHON) -m pip install -e .
 
 install-dev:
-	pip install -e ".[dev,embeddings,reranker]"
+	$(PYTHON) -m pip install -e ".[dev,embeddings,reranker]"
 	pre-commit install
 
 dev:

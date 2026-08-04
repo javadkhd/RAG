@@ -10,7 +10,8 @@ class CrossEncoderReranker:
 
     def _get_model(self):
         if self._model is None:
-            from cross_encoder import CrossEncoder
+            # from cross_encoder import CrossEncoder
+            from sentence_transformers import CrossEncoder
             self._model = CrossEncoder(self.model_name)
         return self._model
 

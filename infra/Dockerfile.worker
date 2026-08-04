@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY pyproject.toml ./
+# COPY pyproject.toml ./
+COPY . .
 RUN pip install --no-cache-dir --prefix=/install -e ".[embeddings,reranker]"
 
 FROM python:3.11-slim
@@ -22,8 +23,11 @@ COPY . /app
 
 RUN mkdir -p /app/storage/uploads
 
-RUN groupadd -r appgroup && useradd -r -g appuser appuser
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 RUN chown -R appuser:appgroup /app
 USER appuser
 
 CMD ["celery", "-A", "app.worker.celery_app", "worker", "--loglevel=info", "--concurrency=4"]
+
+
+
