@@ -59,11 +59,10 @@ typecheck:
 
 migrations:
 	@read -p "Migration message: " msg; \
-	alembic -c config/alembic.ini revision --autogenerate -m "$$msg"
+	$(PYTHON) -m alembic -c config/alembic.ini revision --autogenerate -m "$$msg"
 
 upgrade:
-	alembic -c config/alembic.ini upgrade head
-
+	$(PYTHON) -m alembic -c config/alembic.ini upgrade head
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete

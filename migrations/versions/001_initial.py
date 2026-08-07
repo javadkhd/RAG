@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-
+from pgvector.sqlalchemy import Vector
 
 revision: str = "001_initial"
 down_revision: str | None = None
@@ -14,6 +14,11 @@ depends_on: Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    # PostgreSQL extensions
+    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+    op.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto")
+    
+    
     op.create_table(
         "workspaces",
         sa.Column("id", postgresql.UUID(as_uuid=True), server_default=sa.text("gen_random_uuid()"), nullable=False),
@@ -89,7 +94,7 @@ def upgrade() -> None:
         sa.Column("dataset_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("model", sa.String(255), nullable=False),
         sa.Column("dimensions", sa.Integer(), nullable=False),
-        sa.Column("vector", postgresql.VECTOR(1536), nullable=True),
+        sa.Column("vector", Vector(1536), nullable=True),
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name="pk_embeddings"),
         sa.ForeignKeyConstraint(["chunk_id"], ["chunks.id"], ondelete="CASCADE", name="fk_embeddings_chunk_id"),

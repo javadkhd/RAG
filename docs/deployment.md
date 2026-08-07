@@ -55,24 +55,79 @@ The Dockerfile uses BuildKit cache mounts for pip, which persist downloaded whee
 
 ## Environment Variables
 
-All environment-specific configuration is managed through the `.env` file. The `docker-compose.yml` references these variables using `${VAR}` syntax.
+The project uses two layers of environment configuration:
+
+1. **`.env` file** — Local development defaults (loaded automatically by Docker Compose and the application)
+2. **`docker-compose.yml`** — Docker network-specific values that override `.env` where needed
+
+This separation ensures that:
+- Local development uses `localhost` for services
+- Docker containers use service hostnames (`postgres`, `redis`, `ollama`) for internal communication
+
+### Application Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `POSTGRES_USER` | PostgreSQL username | `rag` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `ragpass` |
-| `POSTGRES_DB` | PostgreSQL database name | `ragdb` |
-| `DATABASE_URL` | Full PostgreSQL connection string | `postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb` (Docker) |
 | `REDIS_URL` | Redis connection string | `redis://redis:6379/0` |
 | `CELERY_BROKER_URL` | Celery broker URL | `redis://redis:6379/1` |
 | `CELERY_RESULT_BACKEND` | Celery result backend | `redis://redis:6379/2` |
 | `LLM_PROVIDER` | LLM provider name | `ollama` |
 | `LLM_MODEL` | LLM model name | `llama3` |
 | `LLM_BASE_URL` | LLM API URL | `http://ollama:11434` |
+| `LLM_API_KEY` | LLM API key (if required by provider) | *(empty)* |
 | `EMBEDDING_PROVIDER` | Embedding provider | `bge_m3` |
 | `EMBEDDING_MODEL_NAME` | Embedding model identifier | `BAAI/bge-m3` |
 | `EMBEDDING_DEVICE` | Embedding compute device | `cpu` |
 | `SECRET_KEY` | Application secret | Required in production |
+
+### Infrastructure Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `POSTGRES_USER` | PostgreSQL username | `rag` |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `ragpass` |
+| `POSTGRES_DB` | PostgreSQL database name | `ragdb` |
+| `POSTGRES_PORT` | PostgreSQL host port | `5432` |
+| `REDIS_PORT` | Redis host port | `6379` |
+| `OLLAMA_PORT` | Ollama host port | `11434` |
+| `API_PORT` | API host port | `8000` |
+
+## Database Migrations
+
+The project uses Alembic for database migrations with async SQLAlchemy support.
+
+### Running Migrations in Docker
+
+```bash
+# Apply all pending migrations
+docker compose exec api alembic upgrade head
+
+# Generate a new migration (inside the api container)
+docker compose exec api alembic -c config/alembic.ini revision --autogenerate -m "description"
+
+# View migration history
+docker compose exec api alembic history
+```
+
+### Running Migrations Locally
+
+```bash
+# Ensure .env has the correct DATABASE_URL (default: localhost)
+# Apply all pending migrations
+alembic -c config/alembic.ini upgrade head
+
+# Generate a new migration
+alembic -c config/alembic.ini revision --autogenerate -m "description"
+```
+
+### Migration Configuration
+
+- **`config/alembic.ini`** — Alembic configuration (logging, script location)
+- **`migrations/env.py`** — Migration environment (reads database URL from app settings)
+- **`migrations/versions/`** — Migration scripts
+
+The `env.py` reads the database URL from the application settings, ensuring consistent configuration across local development and Docker environments.
 
 ## Production Checklist
 
