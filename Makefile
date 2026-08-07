@@ -1,4 +1,4 @@
-.PHONY: help dev test lint clean install migrations upgrade install-dev
+.PHONY: help dev test lint clean install migrations upgrade install-dev docker-up docker-down docker-logs docker-build docker-build-api docker-build-worker docker-rebuild docker-clean docker-prune
 
 help:
 	@echo "RAG Platform Makefile"
@@ -15,9 +15,15 @@ help:
 	@echo "  make migrations   Create new alembic migration"
 	@echo "  make upgrade      Apply database migrations"
 	@echo "  make clean        Clean cache and build artifacts"
-	@echo "  make docker-up    Start Docker services"
-	@echo "  make docker-down  Stop Docker services"
-	@echo "  make docker-logs  Show Docker logs"
+	@echo "  make docker-up      Start Docker services"
+	@echo "  make docker-down    Stop Docker services"
+	@echo "  make docker-logs    Show Docker logs"
+	@echo "  make docker-build   Build all Docker images"
+	@echo "  make docker-build-api   Build API image only"
+	@echo "  make docker-build-worker  Build Worker image only"
+	@echo "  make docker-rebuild Rebuild images with no cache"
+	@echo "  make docker-clean   Remove containers and images"
+	@echo "  make docker-prune   Remove unused Docker resources"
 
 
 PYTHON := python3
@@ -75,3 +81,21 @@ docker-down:
 
 docker-logs:
 	docker compose logs -f
+
+docker-build:
+	docker compose build
+
+docker-build-api:
+	docker compose build --target runtime-api api
+
+docker-build-worker:
+	docker compose build --target runtime-worker worker
+
+docker-rebuild:
+	docker compose build --no-cache
+
+docker-clean:
+	docker compose down -v --rmi local
+
+docker-prune:
+	docker system prune -f --volumes

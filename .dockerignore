@@ -27,4 +27,18 @@ logs
 
 *.ipynb
 
-tests
+# tests
+# docs
+# migrations
+# scripts
+
+infra/docker
+
+.github
+
+# *.md
+.coverage
+htmlcov
+
+Dockerfile.api
+Dockerfile.worker
