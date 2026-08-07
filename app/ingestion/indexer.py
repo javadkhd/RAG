@@ -1,6 +1,6 @@
-from collections.abc import Sequence
 from typing import Any
 
+from app.config import settings
 from app.models.base import Chunk, Document, Embedding
 from app.providers.embeddings.base import EmbeddingProvider
 
@@ -9,13 +9,18 @@ class Indexer:
     def __init__(self, session, provider: EmbeddingProvider | None = None) -> None:
         self.session = session
         self.provider = provider
+        self.chunk_size = settings.ingestion.chunk_size
+        self.overlap = settings.ingestion.chunk_overlap
+        self.model_name = settings.embedding.model_name
 
-    async def index(self, documents: list[dict[str, Any]], dataset_id, workspace_id) -> None:
-        from app.ingestion.splitter import split
+    async def index(
+        self, documents: list[dict[str, Any]], dataset_id, workspace_id
+    ) -> dict[str, int]:
         from app.ingestion.cleaner import clean
+        from app.ingestion.splitter import split
 
-        chunk_size = 512
-        overlap = 50
+        chunks_created = 0
+        embeddings_generated = 0
 
         for doc in documents:
             document = Document(
@@ -31,7 +36,8 @@ class Indexer:
             self.session.add(document)
             await self.session.flush()
 
-            chunks = split(doc["text"], chunk_size=chunk_size, overlap=overlap)
+            cleaned_text = clean(doc["text"])
+            chunks = split(cleaned_text, chunk_size=self.chunk_size, overlap=self.overlap)
             for idx, chunk_text in enumerate(chunks):
                 chunk = Chunk(
                     document_id=document.id,
@@ -50,11 +56,19 @@ class Indexer:
                         chunk_id=chunk.id,
                         workspace_id=workspace_id,
                         dataset_id=dataset_id,
-                        model="placeholder",
+                        model=self.model_name,
                         dimensions=len(vectors[0]) if vectors else 0,
                         vector=vectors[0] if vectors else None,
                     )
                     self.session.add(embedding)
+                    embeddings_generated += 1
+
+                chunks_created += 1
 
             document.status = "completed"
             await self.session.flush()
+
+        return {
+            "chunks_created": chunks_created,
+            "embeddings_generated": embeddings_generated,
+        }

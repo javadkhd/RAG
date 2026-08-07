@@ -16,11 +16,12 @@ dist
 build
 *.egg-info
 
-.env
-.env.*
+# .env
+# .env.*
 
 storage
 logs
+data
 
 .idea
 .vscode

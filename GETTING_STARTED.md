@@ -130,9 +130,73 @@ curl -X POST http://localhost:8000/datasets \
     "workspace_id": "550e8400-e29b-41d4-a716-446655440000",
     "name": "Product Documentation",
     "connector_type": "markdown",
-    "connector_config": {"path": "./data/docs"}
+    "connector_config": {"path": "data/docs"}
   }'
 ```
+
+### 3. Add Markdown Files
+
+Place markdown files in the `data/docs/` directory. The `connector_config.path` in your dataset should match relative to the project root.
+
+```bash
+# Example file structure
+data/
+  docs/
+    example.md
+    subdirectory/
+      another.md
+```
+
+Example markdown with frontmatter:
+
+```markdown
+---
+title: Payment Documentation
+category: payment
+version: 1
+---
+
+# Payment Processing
+
+This document covers payment processing.
+```
+
+> **Docker note:** The `data/` directory is mounted into both the API and worker containers at `/app/data`. Any files added to the host `data/` directory are immediately available inside containers.
+
+### 4. Trigger Ingestion
+
+Queue an asynchronous ingestion task:
+
+```bash
+curl -X POST http://localhost:8000/datasets/<dataset-id>/ingest
+```
+
+Response:
+```json
+{
+    "dataset_id": "<dataset-id>",
+    "task_id": "<celery-task-id>",
+    "status": "queued"
+}
+```
+
+The ingestion runs asynchronously in the Celery worker. The task will:
+1. Load documents from the configured path
+2. Clean and split text into chunks
+3. Generate embeddings
+4. Store everything in PostgreSQL with pgvector
+
+> **Docker note:** When using Docker, start the API, worker, and infrastructure services with:
+> ```bash
+> make docker-up
+>
+> # Wait for services to be healthy, then run migrations
+> docker compose exec api alembic upgrade head
+>
+> # Trigger ingestion (worker must be running)
+> docker compose up -d worker
+> docker compose up -d api
+> ```
 
 ### 3. Chat with RAG
 

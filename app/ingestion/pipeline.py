@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Any
 
 from app.connectors.base import BaseConnector
-from app.ingestion.splitter import split
+from app.ingestion.indexer import Indexer
 
 
 @dataclass
@@ -21,14 +20,14 @@ class IngestionPipeline:
 
     async def run(self, path: str, dataset_id, workspace_id) -> IngestionResult:
         result = IngestionResult()
+
         documents = await self.connector.load(path, dataset_id, workspace_id)
         result.documents_loaded = len(documents)
 
         indexer = Indexer(self.session, provider=self.embedder)
-        await indexer.index(documents, dataset_id, workspace_id)
+        index_result = await indexer.index(documents, dataset_id, workspace_id)
 
-        result.chunks_created = sum(len(split(doc["text"])) for doc in documents)
-        if self.embedder is not None:
-            result.embeddings_generated = result.chunks_created
+        result.chunks_created = index_result["chunks_created"]
+        result.embeddings_generated = index_result["embeddings_generated"]
 
         return result
