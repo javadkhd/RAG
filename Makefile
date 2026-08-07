@@ -37,25 +37,25 @@ install-dev:
 	pre-commit install
 
 dev:
-	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	$(PYTHON) -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 worker:
-	celery -A app.worker.celery_app worker --loglevel=info
+	$(PYTHON) -m celery -A app.worker.celery_app worker --loglevel=info
 
 test:
-	pytest tests/ -v
+	$(PYTHON) -m pytest tests/ -v
 
 test-cov:
-	pytest tests/ --cov=app --cov-report=term-missing -v
+	$(PYTHON) -m pytest tests/ --cov=app --cov-report=term-missing -v
 
 lint:
-	ruff check app/ tests/
+	$(PYTHON) -m ruff check app/ tests/
 
 format:
-	ruff format app/ tests/
+	$(PYTHON) -m ruff format app/ tests/
 
 typecheck:
-	mypy app/
+	$(PYTHON) -m mypy app/
 
 migrations:
 	@read -p "Migration message: " msg; \
