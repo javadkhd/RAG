@@ -63,6 +63,7 @@ migrations:
 
 upgrade:
 	$(PYTHON) -m alembic -c config/alembic.ini upgrade head
+	
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
