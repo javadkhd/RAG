@@ -25,12 +25,14 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 FROM base AS runtime-base
 
-COPY --from=builder /install /usr/local
-COPY . /app
+ENV HOME=/home/appuser
+RUN mkdir -p /app/data/huggingface /app/storage/uploads \
+    && groupadd -g 999 appgroup \
+    && useradd -u 999 -g 999 --create-home --home-dir /home/appuser --shell /bin/sh appuser \
+    && chown -R appuser:appgroup /app
 
-RUN mkdir -p /app/storage/uploads && \
-    groupadd -r appgroup && useradd -r -g appgroup appuser && \
-    chown -R appuser:appgroup /app
+COPY --from=builder /install /usr/local
+COPY --chown=appuser:appgroup . /app
 
 USER appuser
 

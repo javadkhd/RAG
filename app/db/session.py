@@ -1,10 +1,10 @@
 from sqlalchemy.ext.asyncio import (
-    AsyncAttrs,
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.pool import NullPool
 
 from app.config import settings
 from app.models.base import Base
@@ -46,6 +46,25 @@ class Database:
 
 
 db = Database()
+
+
+def create_worker_session_factory() -> async_sessionmaker[AsyncSession]:
+    """Create a NullPool-based session factory for Celery worker tasks.
+
+    Must be called inside the event loop where sessions will be used.
+    NullPool ensures connections are never shared across event loops
+    or forked processes, preventing "Future attached to a different loop" errors.
+    """
+    engine = create_async_engine(
+        settings.database.url,
+        echo=False,
+        poolclass=NullPool,
+    )
+    return async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    ), engine
 
 
 async def get_db() -> AsyncSession:

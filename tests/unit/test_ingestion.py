@@ -305,3 +305,13 @@ class TestCeleryTask:
         from app.worker.tasks import ingest_dataset
 
         assert ingest_dataset.__name__ == "ingest_dataset"
+
+    def test_tasks_do_not_use_global_db(self):
+        import inspect
+
+        from app.worker import tasks as tasks_module
+
+        source = inspect.getsource(tasks_module)
+        assert "_ensure_db_initialized" not in source
+        assert "db.async_session_factory" not in source
+        assert "create_worker_session_factory" in source

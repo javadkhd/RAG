@@ -3,29 +3,23 @@ import logging
 
 from celery import shared_task
 
-from app.db.session import db
 from app.services.ingestion import IngestionService
 
 logger = logging.getLogger(__name__)
 
-_db_initialized = False
-
-
-def _ensure_db_initialized() -> None:
-    global _db_initialized
-    if not _db_initialized:
-        db.init()
-        _db_initialized = True
-
 
 @shared_task(bind=True, name="app.worker.tasks.ingest_dataset")
 def ingest_dataset(self, dataset_id: str) -> dict:
-    _ensure_db_initialized()
-
     async def _run() -> dict:
-        async with db.async_session_factory() as session:
-            service = IngestionService(session=session)
-            return await service.ingest_dataset(dataset_id)
+        from app.db.session import create_worker_session_factory
+
+        session_factory, engine = create_worker_session_factory()
+        try:
+            async with session_factory() as session:
+                service = IngestionService(session=session)
+                return await service.ingest_dataset(dataset_id)
+        finally:
+            await engine.dispose()
 
     try:
         return asyncio.run(_run())
@@ -36,4 +30,33 @@ def ingest_dataset(self, dataset_id: str) -> dict:
 
 @shared_task(bind=True, name="app.worker.tasks.generate_embeddings")
 def generate_embeddings(self, dataset_id: str) -> dict:
-    return {"dataset_id": dataset_id, "status": "queued"}
+    async def _run() -> dict:
+        from uuid import UUID
+
+        from sqlalchemy import select
+
+        from app.db.session import create_worker_session_factory
+        from app.models.base import Dataset
+
+        session_factory, engine = create_worker_session_factory()
+        try:
+            async with session_factory() as session:
+                result = await session.execute(
+                    select(Dataset).where(Dataset.id == UUID(dataset_id))
+                )
+                dataset = result.scalar_one_or_none()
+                if not dataset:
+                    return {
+                        "dataset_id": dataset_id,
+                        "status": "error",
+                        "error": "Dataset not found",
+                    }
+                return {"dataset_id": dataset_id, "status": "queued"}
+        finally:
+            await engine.dispose()
+
+    try:
+        return asyncio.run(_run())
+    except Exception as exc:
+        logger.exception("Embedding generation failed for dataset %s: %s", dataset_id, exc)
+        raise
