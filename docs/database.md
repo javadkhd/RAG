@@ -72,7 +72,7 @@ Vector representation of a chunk.
 | dataset_id | UUID | FK to datasets |
 | model | VARCHAR(255) | Embedding model name |
 | dimensions | INTEGER | Vector dimensions |
-| vector | VECTOR(1536) | The embedding vector |
+| vector | VECTOR(1024) | The embedding vector |
 | created_at | TIMESTAMP | Creation timestamp |
 
 ### Conversation

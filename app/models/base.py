@@ -6,6 +6,7 @@ from sqlalchemy import DateTime, String, Text, ForeignKey, Float, Integer, Boole
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from app.constants import EMBEDDING_DIMENSIONS
 from app.db.types import Vector
 
 
@@ -77,7 +78,7 @@ class Embedding(Base):
     dataset_id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), ForeignKey("datasets.id", ondelete="CASCADE"), nullable=False)
     model: Mapped[str] = mapped_column(String(255), nullable=False)
     dimensions: Mapped[int] = mapped_column(Integer, nullable=False)
-    vector: Mapped[Optional[Vector]] = mapped_column(Vector(1536), nullable=True)
+    vector: Mapped[Optional[Vector]] = mapped_column(Vector(EMBEDDING_DIMENSIONS), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 

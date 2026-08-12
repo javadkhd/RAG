@@ -7,6 +7,9 @@ from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+from app.constants import EMBEDDING_DIMENSIONS
+
+
 def _load_yaml(filename: str) -> dict[str, Any]:
     config_path = Path(__file__).parent.parent / "config" / filename
     if not config_path.exists():
@@ -16,25 +19,25 @@ def _load_yaml(filename: str) -> dict[str, Any]:
 
 
 class DatabaseSettings(BaseModel):
-    url: str = "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
+    url: str = "postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb"
     echo: bool = True
     pool_size: int = 5
     max_overflow: int = 10
 
 
 class RedisSettings(BaseModel):
-    url: str = "redis://localhost:6379/0"
+    url: str = "redis://redis:6379/0"
 
 
 class CelerySettings(BaseModel):
-    broker_url: str = "redis://localhost:6379/1"
-    result_backend: str = "redis://localhost:6379/2"
+    broker_url: str = "redis://redis:6379/1"
+    result_backend: str = "redis://redis:6379/2"
 
 
 class LLMSettings(BaseModel):
     provider: str = "ollama"
-    model: str = "llama3"
-    base_url: str = "http://localhost:11434"
+    model: str = "phi3:3.8b-mini-128k-instruct-q2_K"
+    base_url: str = "http://ollama:11434"
     api_key: str = ""
     temperature: float = 0.1
     max_tokens: int = 4096
@@ -45,6 +48,7 @@ class EmbeddingSettings(BaseModel):
     model_name: str = "BAAI/bge-m3"
     device: str = "cpu"
     normalize: bool = True
+    dimensions: int = EMBEDDING_DIMENSIONS
 
 
 class RetrievalSettings(BaseModel):

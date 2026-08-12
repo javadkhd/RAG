@@ -9,23 +9,23 @@ server:
   reload: true
 
 database:
-  url: "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
+  url: "postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb"
   echo: true
   pool_size: 5
   max_overflow: 10
 
 redis:
-  url: "redis://localhost:6379/0"
+  url: "redis://redis:6379/0"
 
 celery:
-  broker_url: "redis://localhost:6379/1"
-  result_backend: "redis://localhost:6379/2"
+  broker_url: "redis://redis:6379/1"
+  result_backend: "redis://redis:6379/2"
 
 llm:
   provider: "ollama"
   # model: "llama3" 
-  model: "llama3:8b-q4_K_M" # or mistral:7b-q4_K_M, qwen2:7b-q4_K_M
-  base_url: "http://localhost:11434"
+  model: "phi3:3.8b-mini-128k-instruct-q2_K" #"llama3:8b-q4_K_M" # or mistral:7b-q4_K_M, qwen2:7b-q4_K_M
+  base_url: "http://ollama:11434"
   temperature: 0.1
   max_tokens: 4096
 

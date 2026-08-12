@@ -17,3 +17,7 @@ build/
 htmlcov/
 
 data/huggingface/
+
+
+
+# مدل BGE-M3 در هر request دوباره load می‌شود.
