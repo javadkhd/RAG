@@ -15,3 +15,5 @@ build/
 *.ipynb
 .coverage
 htmlcov/
+
+data/huggingface/
