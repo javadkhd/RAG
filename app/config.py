@@ -36,7 +36,7 @@ class CelerySettings(BaseModel):
 
 class LLMSettings(BaseModel):
     provider: str = "ollama"
-    model: str = "phi3:3.8b-mini-128k-instruct-q2_K"
+    model: str = "qwen2.5:0.5b"
     base_url: str = "http://ollama:11434"
     api_key: str = ""
     temperature: float = 0.1

@@ -36,7 +36,7 @@ class TestOllamaLLMProvider:
         mock_client.post.return_value = mock_response
 
         with patch("app.providers.llm.ollama.httpx.AsyncClient", return_value=mock_client):
-            provider = OllamaLLMProvider(model="phi3:3.8b-mini-128k-instruct-q2_K")
+            provider = OllamaLLMProvider(model="qwen2.5:0.5b")
             result = await provider.generate("Hi")
 
         assert result == "Hello from Ollama"
@@ -71,7 +71,7 @@ class TestOllamaLLMProvider:
                 return False
 
         with patch("app.providers.llm.ollama.httpx.AsyncClient", return_value=MockClientContext()):
-            provider = OllamaLLMProvider(model="phi3:3.8b-mini-128k-instruct-q2_K")
+            provider = OllamaLLMProvider(model="qwen2.5:0.5b")
             chunks = []
             async for chunk in provider.generate_stream("Hi"):
                 chunks.append(chunk)
@@ -134,7 +134,7 @@ class TestGeminiLLMProvider:
 
 class TestLLMProviderProtocol:
     def test_ollama_satisfies_protocol(self):
-        provider = OllamaLLMProvider(model="phi3:3.8b-mini-128k-instruct-q2_K")
+        provider = OllamaLLMProvider(model="qwen2.5:0.5b")
         assert isinstance(provider, LLMProvider)
 
     def test_openai_satisfies_protocol(self):

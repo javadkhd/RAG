@@ -24,7 +24,7 @@ celery:
 llm:
   provider: "ollama"
   # model: "llama3" 
-  model: "phi3:3.8b-mini-128k-instruct-q2_K" #"llama3:8b-q4_K_M" # or mistral:7b-q4_K_M, qwen2:7b-q4_K_M
+  model: "qwen2.5:0.5b" # phi3:3.8b-mini-128k-instruct-q2_K, llama3:8b-q4_K_M, mistral:7b-q4_K_M, qwen2:7b-q4_K_M
   base_url: "http://ollama:11434"
   temperature: 0.1
   max_tokens: 4096
