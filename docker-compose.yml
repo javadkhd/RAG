@@ -140,9 +140,10 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          # memory: 512M
+          memory: 5G
         reservations:
-          memory: 256M
+          memory: 2G
     healthcheck:
       test: ["CMD", "celery", "-A", "app.worker.celery_app", "inspect", "ping"]
       interval: 30s
