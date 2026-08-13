@@ -19,7 +19,7 @@ def _load_yaml(filename: str) -> dict[str, Any]:
 
 
 class DatabaseSettings(BaseModel):
-    url: str = "postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb"
+    url: str = "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
     echo: bool = True
     pool_size: int = 5
     max_overflow: int = 10

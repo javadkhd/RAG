@@ -69,7 +69,8 @@ services:
     ports:
       - "${API_PORT:-8000}:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb
+      # DATABASE_URL: postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2
@@ -112,7 +113,8 @@ services:
       target: runtime-worker
     container_name: rag_worker
     environment:
-      DATABASE_URL: postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb
+      # DATABASE_URL: postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/1
       CELERY_RESULT_BACKEND: redis://redis:6379/2

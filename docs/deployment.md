@@ -68,7 +68,7 @@ This separation ensures that:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb` (Docker) |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb` (Docker) |
 | `REDIS_URL` | Redis connection string | `redis://redis:6379/0` |
 | `CELERY_BROKER_URL` | Celery broker URL | `redis://redis:6379/1` |
 | `CELERY_RESULT_BACKEND` | Celery result backend | `redis://redis:6379/2` |

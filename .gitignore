@@ -18,6 +18,6 @@ htmlcov/
 
 data/huggingface/
 
-
+logs/
 
 # مدل BGE-M3 در هر request دوباره load می‌شود.

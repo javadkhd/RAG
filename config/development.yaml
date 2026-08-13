@@ -9,7 +9,7 @@ server:
   reload: true
 
 database:
-  url: "postgresql+asyncpg://rag:ragpass@postgres:5432/ragdb"
+  url: "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
   echo: true
   pool_size: 5
   max_overflow: 10

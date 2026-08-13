@@ -118,9 +118,21 @@ class ChatService:
 
     @staticmethod
     def _build_prompt(query: str, context: str) -> str:
-        return (
-            "You are a helpful assistant. Use the following context to answer the question.\n\n"
+        prompt = (
+            """
+You are a retrieval-augmented question answering assistant.
+
+Answer the user's question using ONLY the information in the provided context.
+
+Rules:
+- Do not use outside knowledge.
+- If the answer is not present in the context, say "I don't know based on the provided context."
+- Do not guess.
+- Give a concise answer.
+
+"""
             f"Context:\n{context}\n\n"
             f"Question: {query}\n\n"
             "Answer:"
         )
+        return prompt
