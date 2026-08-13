@@ -4,6 +4,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.models.base import Dataset
 
 
@@ -30,7 +31,7 @@ class IngestionService:
         connector_config = dataset.connector_config or {}
 
         if connector_type == "markdown":
-            path = connector_config.get("path", "data/docs")
+            path = connector_config.get("path", settings.ingestion.default_doc_path)
             connector = MarkdownConnector()
         else:
             raise ValueError(f"Unsupported connector type: {connector_type}")

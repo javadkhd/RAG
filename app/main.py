@@ -50,13 +50,17 @@ app = FastAPI(
 )
 
 app.add_middleware(ErrorHandlingMiddleware)
-app.add_middleware(RateLimitMiddleware, max_requests=100, window_seconds=60)
+app.add_middleware(
+    RateLimitMiddleware,
+    max_requests=settings.api.rate_limit_max_requests,
+    window_seconds=settings.api.rate_limit_window_seconds,
+)
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(RequestIdMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.api.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -100,7 +104,7 @@ async def _check_database() -> str:
 
 async def _check_ollama() -> str:
     try:
-        async with httpx.AsyncClient(timeout=2.0) as client:
+        async with httpx.AsyncClient(timeout=settings.api.health_check_timeout) as client:
             response = await client.get(f"{settings.llm.base_url}/api/tags")
             if response.status_code == 200:
                 return "ok"

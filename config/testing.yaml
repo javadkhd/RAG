@@ -11,6 +11,7 @@ server:
 database:
   url: "postgresql+asyncpg://rag:ragpass@localhost:5432/ragtestdb"
   echo: false
+  hide_parameters: true
   pool_size: 2
   max_overflow: 5
 
@@ -27,12 +28,15 @@ llm:
   base_url: "http://localhost:11434"
   temperature: 0.0
   max_tokens: 512
+  request_timeout: 30.0
 
 embedding:
   provider: "mock"
   model_name: "mock-model"
+  base_url: "http://localhost:11434"
   device: "cpu"
   normalize: true
+  request_timeout: 30.0
 
 retrieval:
   dense_weight: 0.6
@@ -41,10 +45,27 @@ retrieval:
   rerank_top_k: 3
   similarity_threshold: 0.5
 
+reranker:
+  cross_encoder_model_name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
 ingestion:
   chunk_size: 256
   chunk_overlap: 25
   max_workers: 1
+  default_doc_path: "./storage/test_docs"
+
+api:
+  cors_origins: ["*"]
+  rate_limit_max_requests: 100
+  rate_limit_window_seconds: 60
+  health_check_timeout: 2.0
+
+worker:
+  worker_prefetch_multiplier: 1
+  task_time_limit: 1800
+  task_soft_time_limit: 1740
+  concurrency: 1
+  loglevel: "info"
 
 storage:
   upload_dir: "./storage/test_uploads"

@@ -1,14 +1,14 @@
-from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import settings
 from app.models.base import Conversation, Message
 from app.providers.llm.base import LLMProvider
+from app.retrieval.base import Reranker, Retriever
 from app.retrieval.pipeline import RetrievalPipeline
-from app.retrieval.base import Retriever, Reranker
 
 
 class ChatService:
@@ -17,16 +17,16 @@ class ChatService:
         session: AsyncSession,
         llm_provider: LLMProvider,
         retriever: Retriever,
-        reranker: Optional[Reranker] = None,
+        reranker: Reranker | None = None,
     ) -> None:
         self.session = session
         self.llm_provider = llm_provider
         self.pipeline = RetrievalPipeline(
             retriever=retriever,
             reranker=reranker,
-            top_k=5,
-            rerank_top_k=5,
-            similarity_threshold=0.7,
+            top_k=settings.retrieval.top_k,
+            rerank_top_k=settings.retrieval.rerank_top_k,
+            similarity_threshold=settings.retrieval.similarity_threshold,
         )
 
     async def chat(self, payload: Any) -> Any:
@@ -52,7 +52,10 @@ class ChatService:
 
         results = await self.pipeline.retrieve(
             query=request.message,
-            filters={"workspace_id": str(request.workspace_id), "dataset_id": str(request.dataset_id)},
+            filters={
+                "workspace_id": str(request.workspace_id),
+                "dataset_id": str(request.dataset_id),
+            },
         )
 
         context = self._build_context(results)
@@ -79,16 +82,22 @@ class ChatService:
         await self.session.commit()
         await self.session.refresh(assistant_message)
 
+        sources = (
+            assistant_message.sources.get("sources", [])
+            if assistant_message.sources
+            else []
+        )
+
         return ChatResponse(
             answer=answer,
             conversation_id=conversation.id,
             message_id=assistant_message.id,
-            sources=assistant_message.sources.get("sources", []) if assistant_message.sources else [],
+            sources=sources,
         )
 
     async def _get_or_create_conversation(
         self,
-        conversation_id: Optional[UUID],
+        conversation_id: UUID | None,
         workspace_id: UUID,
     ) -> Conversation:
         if conversation_id:

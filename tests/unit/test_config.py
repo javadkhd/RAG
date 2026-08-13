@@ -1,4 +1,12 @@
-from app.config import DatabaseSettings, RedisSettings, Settings
+from app.config import (
+    ApiSettings,
+    DatabaseSettings,
+    EmbeddingSettings,
+    LLMSettings,
+    RedisSettings,
+    Settings,
+    WorkerSettings,
+)
 
 
 def test_settings_load_development(monkeypatch):
@@ -25,3 +33,32 @@ def test_database_settings_defaults():
 def test_redis_settings_defaults():
     redis = RedisSettings()
     assert redis.url == "redis://redis:6379/0"
+
+
+def test_api_settings_defaults():
+    api = ApiSettings()
+    assert api.cors_origins == ["*"]
+    assert api.rate_limit_max_requests == 100
+    assert api.rate_limit_window_seconds == 60
+    assert api.health_check_timeout == 2.0
+
+
+def test_llm_settings_defaults():
+    llm = LLMSettings()
+    assert llm.provider == "ollama"
+    assert llm.request_timeout == 120.0
+
+
+def test_embedding_settings_defaults():
+    emb = EmbeddingSettings()
+    assert emb.provider == "bge_m3"
+    assert emb.request_timeout == 60.0
+
+
+def test_worker_settings_defaults():
+    worker = WorkerSettings()
+    assert worker.worker_prefetch_multiplier == 1
+    assert worker.task_time_limit == 1800
+    assert worker.task_soft_time_limit == 1740
+    assert worker.concurrency == 1
+    assert worker.loglevel == "info"

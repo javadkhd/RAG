@@ -1,12 +1,17 @@
 from collections.abc import Sequence
-from typing import Any
 
-from app.providers.embeddings.base import EmbeddingProvider
+from app.config import settings
 
 
 class BgeEmbeddingProvider:
-    def __init__(self, model_name: str = "BAAI/bge-m3", device: str = "cpu", normalize: bool = True) -> None:
-        self.model_name = model_name
+    def __init__(
+        self,
+        model_name: str = "",
+        device: str = "cpu",
+        normalize: bool = True,
+        base_url: str = "",
+    ) -> None:
+        self.model_name = model_name or settings.embedding.model_name
         self.device = device
         self.normalize = normalize
         self._model = None

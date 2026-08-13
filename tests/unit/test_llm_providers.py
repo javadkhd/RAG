@@ -1,7 +1,5 @@
-import asyncio
 import json
 import sys
-from collections.abc import AsyncIterator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -18,10 +16,10 @@ if "google" not in sys.modules:
 if "google.generativeai" not in sys.modules:
     sys.modules["google.generativeai"] = MagicMock()
 
-from app.providers.llm.openai import OpenAILLMProvider  # noqa: E402
+from app.providers.llm import get_llm_provider  # noqa: E402
 from app.providers.llm.anthropic import AnthropicLLMProvider  # noqa: E402
 from app.providers.llm.gemini import GeminiLLMProvider  # noqa: E402
-from app.providers.llm import get_llm_provider  # noqa: E402
+from app.providers.llm.openai import OpenAILLMProvider  # noqa: E402
 
 
 class TestOllamaLLMProvider:
@@ -150,6 +148,8 @@ class TestGetLLMProvider:
         assert isinstance(provider, OllamaLLMProvider)
 
     def test_get_unknown_provider(self):
-        with patch("app.providers.llm.settings.llm.provider", "unknown"):
-            with pytest.raises(ValueError):
-                get_llm_provider()
+        with (
+            patch("app.providers.llm.settings.llm.provider", "unknown"),
+            pytest.raises(ValueError),
+        ):
+            get_llm_provider()

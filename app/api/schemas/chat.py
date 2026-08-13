@@ -1,17 +1,21 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+
+from app.config import settings
 
 
 class ChatRequest(BaseModel):
     workspace_id: UUID
     dataset_id: UUID
     message: str = Field(..., min_length=1)
-    conversation_id: Optional[UUID] = None
-    top_k: int = Field(default=5, ge=1, le=20)
-    similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0)
+    conversation_id: UUID | None = None
+    top_k: int = Field(default=settings.retrieval.top_k, ge=1, le=20)
+    similarity_threshold: float = Field(
+        default=settings.retrieval.similarity_threshold, ge=0.0, le=1.0
+    )
 
 
 class ChatResponse(BaseModel):
@@ -30,7 +34,7 @@ class ChatStreamEvent(BaseModel):
 
 class ConversationCreate(BaseModel):
     workspace_id: UUID
-    title: Optional[str] = None
+    title: str | None = None
 
 
 class ConversationResponse(BaseModel):
@@ -38,7 +42,7 @@ class ConversationResponse(BaseModel):
 
     id: UUID
     workspace_id: UUID
-    title: Optional[str] = None
+    title: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -50,5 +54,5 @@ class MessageResponse(BaseModel):
     conversation_id: UUID
     role: str
     content: str
-    sources: Optional[dict] = None
+    sources: dict | None = None
     created_at: datetime
