@@ -1,4 +1,4 @@
-from app.config import Settings, DatabaseSettings, RedisSettings
+from app.config import DatabaseSettings, RedisSettings, Settings
 
 
 def test_settings_load_development(monkeypatch):
@@ -17,10 +17,11 @@ def test_settings_env_override(monkeypatch):
 def test_database_settings_defaults():
     db = DatabaseSettings()
     assert db.url == "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
-    assert db.echo is True
+    assert db.echo is False
+    assert db.hide_parameters is True
     assert db.pool_size == 5
 
 
 def test_redis_settings_defaults():
     redis = RedisSettings()
-    assert redis.url == "redis://localhost:6379/0"
+    assert redis.url == "redis://redis:6379/0"

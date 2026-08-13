@@ -6,7 +6,6 @@ import yaml
 from pydantic import BaseModel, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 from app.constants import EMBEDDING_DIMENSIONS
 
 
@@ -14,13 +13,14 @@ def _load_yaml(filename: str) -> dict[str, Any]:
     config_path = Path(__file__).parent.parent / "config" / filename
     if not config_path.exists():
         return {}
-    with open(config_path, "r", encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
 class DatabaseSettings(BaseModel):
     url: str = "postgresql+asyncpg://rag:ragpass@localhost:5432/ragdb"
-    echo: bool = True
+    echo: bool = False
+    hide_parameters: bool = True
     pool_size: int = 5
     max_overflow: int = 10
 

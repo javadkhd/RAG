@@ -122,6 +122,21 @@ User Query → Embedding → Vector Search → BM25 Search → Hybrid Merge → 
 4. **Celery**: Reliable async processing for long-running ingestion tasks
 5. **Provider Interfaces**: All external services accessed through abstract interfaces
 
+## Embedding Lifecycle
+
+The embedding provider is resolved through `get_embedding_provider()` and cached at module scope.
+
+- **API**: Loads the embedding model when the first `/chat` request triggers dense retrieval. The model is reused for all subsequent requests within that worker process.
+- **Worker**: Loads the embedding model during ingestion tasks. The model is reused for all ingestion tasks within that worker process.
+- **Process-Local**: Each API worker and each Worker process maintains its own model instance. This is expected because separate processes cannot share Python objects in memory.
+
+This design avoids per-request model instantiation while keeping initialization lazy (only when embedding is actually needed).
+
+## Health Endpoints
+
+- **`GET /health`**: Liveness probe. Returns `200 OK` with `{"status": "ok"}`. No dependency checks. Suitable for Kubernetes liveness probes.
+- **`GET /health/ready`**: Readiness probe. Checks PostgreSQL, Ollama, and embedding provider status. Returns `200` when ready, `503` when degraded. Does not trigger expensive model loading.
+
 ## Scalability Considerations
 
 - **Horizontal**: Stateless API workers can scale behind a load balancer

@@ -19,6 +19,7 @@ class Database:
         self.engine = create_async_engine(
             settings.database.url,
             echo=settings.database.echo,
+            hide_parameters=settings.database.hide_parameters,
             pool_size=settings.database.pool_size,
             max_overflow=settings.database.max_overflow,
         )

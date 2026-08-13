@@ -143,6 +143,7 @@ The `env.py` reads the database URL from the application settings, ensuring cons
 - [ ] Use managed vector database for >1M vectors
 - [ ] Pin Ollama image version for reproducibility
 - [ ] Review resource limits for your workload
+- [ ] Use `/health` for liveness and `/health/ready` for readiness probes
 
 ## Scaling
 

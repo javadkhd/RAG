@@ -8,7 +8,7 @@ http://localhost:8000
 ## Health
 
 ### GET /health
-Health check endpoint.
+Liveness check. Returns whether the API process is alive.
 
 **Response:**
 ```json
@@ -17,6 +17,39 @@ Health check endpoint.
   "version": "0.1.0"
 }
 ```
+
+### GET /health/ready
+Readiness check. Returns dependency status.
+
+**Response (all healthy):**
+```json
+{
+  "status": "ready",
+  "dependencies": {
+    "postgres": "ok",
+    "ollama": "ok",
+    "embedding": "ok"
+  }
+}
+```
+
+**Response (degraded):**
+```json
+{
+  "status": "degraded",
+  "dependencies": {
+    "postgres": "ok",
+    "ollama": "error",
+    "embedding": "configured"
+  }
+}
+```
+
+| Dependency | Status | Description |
+|-----------|--------|-------------|
+| `postgres` | `ok` / `error` | Database connectivity |
+| `ollama` | `ok` / `error` | LLM provider availability |
+| `embedding` | `ok` / `configured` / `error` | Embedding provider state |
 
 ### GET /
 Root endpoint with platform info.
